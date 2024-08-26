@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemicals Tracking Form</title>
+    <style>
+        .container {
+            width: 70%;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .field-group {
+            margin-bottom: 15px;
+        }
+        .field-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .field-group input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .chemical-block {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+        .chemical-block h3 {
+            margin: 0 0 10px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chemicals Tracking Form</h1>
+        
+        <!-- Step 1: Select number of chemicals -->
+        <form id="chemicalForm">
+            <label for="chemicalCount">Select how many chemicals you have purchased:</label>
+            <select id="chemicalCount" onchange="generateChemicalSelectors()">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+            </select>
+
+            <!-- Chemical selectors will be dynamically added here -->
+            <div id="chemicalSelectors"></div>
+
+            <!-- Chemical detail fields will be dynamically added here -->
+            <div id="chemicalFields"></div>
+
+            <!-- Submit button -->
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const chemicals = [
+            "Methamphetamine Precursor",
+            "Ephedrine",
+            "Pseudoephedrine",
+            "Phenylacetone",
+            "Acetic Anhydride",
+            "Potassium Permanganate",
+            "Red Phosphorus"
+        ];
+
+        function generateChemicalSelectors() {
+            const chemicalCount = parseInt(document.getElementById('chemicalCount').value);
+            const chemicalSelectors = document.getElementById('chemicalSelectors');
+            const chemicalFields = document.getElementById('chemicalFields');
+            chemicalSelectors.innerHTML = '';  // Clear any existing selectors
+            chemicalFields.innerHTML = '';  // Clear any existing fields
+
+            if (chemicalCount > 0) {
+                for (let i = 0; i < chemicalCount; i++) {
+                    const selectorDiv = document.createElement('div');
+
+                    const label = document.createElement('label');
+                    label.innerHTML = `Select Chemical ${i + 1}:`;
+                    selectorDiv.appendChild(label);
+
+                    const select = document.createElement('select');
+                    select.name = `chemical${i + 1}`;
+                    select.id = `chemical${i + 1}`;
+                    select.onchange = updateFields;
+
+                    // Add options for each chemical
+                    chemicals.forEach(chemical => {
+                        const option = document.createElement('option');
+                        option.value = chemical;
+                        option.text = chemical;
+                        select.appendChild(option);
+                    });
+
+                    selectorDiv.appendChild(select);
+                    chemicalSelectors.appendChild(selectorDiv);
+                }
+            }
+        }
+
+        function updateFields() {
+            const chemicalFields = document.getElementById('chemicalFields');
+            chemicalFields.innerHTML = '';  // Clear any existing fields
+
+            const chemicalCount = parseInt(document.getElementById('chemicalCount').value);
+
+            for (let i = 0; i < chemicalCount; i++) {
+                const selectedChemical = document.getElementById(`chemical${i + 1}`).value;
+
+                const chemicalBlock = document.createElement('div');
+                chemicalBlock.className = 'chemical-block';
+
+                const chemicalLabel = document.createElement('h3');
+                chemicalLabel.innerHTML = `Chemical ${i + 1}: ${selectedChemical}`;
+                chemicalBlock.appendChild(chemicalLabel);
+
+                // Seller's Name
+                const sellerNameLabel = document.createElement('label');
+                sellerNameLabel.innerHTML = "Seller's Name:";
+                chemicalBlock.appendChild(sellerNameLabel);
+
+                const sellerNameInput = document.createElement('input');
+                sellerNameInput.type = 'text';
+                sellerNameInput.name = `sellerName${i + 1}`;
+                sellerNameInput.placeholder = "Enter seller's name";
+                chemicalBlock.appendChild(sellerNameInput);
+
+                // Seller's Address
+                const sellerAddressLabel = document.createElement('label');
+                sellerAddressLabel.innerHTML = "Seller's Address:";
+                chemicalBlock.appendChild(sellerAddressLabel);
+
+                const sellerAddressInput = document.createElement('input');
+                sellerAddressInput.type = 'text';
+                sellerAddressInput.name = `sellerAddress${i + 1}`;
+                sellerAddressInput.placeholder = "Enter seller's address";
+                chemicalBlock.appendChild(sellerAddressInput);
+
+                // Amount Purchased (in grams)
+                const amountLabel = document.createElement('label');
+                amountLabel.innerHTML = 'Amount Purchased in quantity :';
+                chemicalBlock.appendChild(amountLabel);
+
+                const amountInput = document.createElement('input');
+                amountInput.type = 'text';
+                amountInput.name = `amount${i + 1}`;
+                amountInput.placeholder = "Enter amount purchased in quantity";
+                chemicalBlock.appendChild(amountInput);
+
+                chemicalFields.appendChild(chemicalBlock);
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+<hr>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyers Information</title>
+    <style>
+        .container {
+            width: 50%;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .field-group {
+            margin-bottom: 15px;
+        }
+        .field-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .field-group input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Buyers Information</h2>
+        <form id="manufacturerForm">
+            <!-- Manufacturer's Name -->
+            <div class="field-group">
+                <label for="manufacturerName">Buyer's Name:</label>
+                <input type="text" id="manufacturerName" name="manufacturerName" placeholder="Enter manufacturer's name">
+            </div>
+            
+            <!-- Manufacturer's Address -->
+            <div class="field-group">
+                <label for="manufacturerAddress">Buyer's Address:</label>
+                <input type="text" id="manufacturerAddress" name="manufacturerAddress" placeholder="Enter manufacturer's address">
+            </div>
+            
+            <!-- Submit button -->
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
