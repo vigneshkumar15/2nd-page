@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <style>
+        .container {
+            width: 60%;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .field-group {
+            margin-bottom: 15px;
+        }
+        .field-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .field-group input[type="text"], .field-group input[type="number"], .field-group input[type="checkbox"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .field-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+        .field-group button {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .field-group button:hover {
+            background-color: #45a049;
+        }
+        .submit-button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .submit-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Product Details</h2>
+        <form id="productForm">
+            <!-- Input for number of chemicals -->
+            <div class="field-group">
+                <label for="numberOfChemicals">Number of Chemicals (0 to 7):</label>
+                <input type="number" id="numberOfChemicals" name="numberOfChemicals" min="0" max="7" required>
+                <button type="button" onclick="generateChemicalFields()">Generate Chemical Fields</button>
+            </div>
+
+            <!-- Container for chemical name inputs -->
+            <div id="chemicalFields"></div>
+
+            <!-- Checkboxes for product types -->
+            <div class="field-group" id="productTypeContainer">
+                <!-- This container will be populated dynamically -->
+            </div>
+
+            <!-- Buttons for generating fields and resetting form -->
+            <div class="field-group">
+                <button type="button" class="submit-button" onclick="resetForm()">Reset</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function generateChemicalFields() {
+            const numberOfChemicals = parseInt(document.getElementById('numberOfChemicals').value);
+            const chemicalFieldsContainer = document.getElementById('chemicalFields');
+            chemicalFieldsContainer.innerHTML = ''; // Clear existing fields
+
+            if (numberOfChemicals > 0 && numberOfChemicals <= 7) {
+                for (let i = 1; i <= numberOfChemicals; i++) {
+                    const fieldGroup = document.createElement('div');
+                    fieldGroup.className = 'field-group';
+
+                    const label = document.createElement('label');
+                    label.textContent = `Chemical ${i} Name:`;
+                    fieldGroup.appendChild(label);
+
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.id = `chemicalName${i}`;
+                    input.name = `chemicalName${i}`;
+                    input.placeholder = `Enter name of Chemical ${i}`;
+                    input.required = true;
+                    fieldGroup.appendChild(input);
+
+                    chemicalFieldsContainer.appendChild(fieldGroup);
+
+                    // Add product type fields for each chemical
+                    const productTypeContainer = document.getElementById('productTypeContainer');
+                    const productFieldGroup = document.createElement('div');
+                    productFieldGroup.className = 'field-group';
+
+                    const productTypeLabel = document.createElement('label');
+                    productTypeLabel.textContent = `Product Type for Chemical ${i}:`;
+                    productFieldGroup.appendChild(productTypeLabel);
+
+                    const tabletsCheckbox = document.createElement('input');
+                    tabletsCheckbox.type = 'checkbox';
+                    tabletsCheckbox.id = `tablets${i}`;
+                    tabletsCheckbox.name = `tablets${i}`;
+                    const tabletsLabel = document.createElement('label');
+                    tabletsLabel.textContent = 'Tablets';
+                    tabletsLabel.htmlFor = `tablets${i}`;
+                    productFieldGroup.appendChild(tabletsCheckbox);
+                    productFieldGroup.appendChild(tabletsLabel);
+
+                    const syrupCheckbox = document.createElement('input');
+                    syrupCheckbox.type = 'checkbox';
+                    syrupCheckbox.id = `syrup${i}`;
+                    syrupCheckbox.name = `syrup${i}`;
+                    const syrupLabel = document.createElement('label');
+                    syrupLabel.textContent = 'Syrup';
+                    syrupLabel.htmlFor = `syrup${i}`;
+                    productFieldGroup.appendChild(syrupCheckbox);
+                    productFieldGroup.appendChild(syrupLabel);
+
+                    const powderCheckbox = document.createElement('input');
+                    powderCheckbox.type = 'checkbox';
+                    powderCheckbox.id = `powder${i}`;
+                    powderCheckbox.name = `powder${i}`;
+                    const powderLabel = document.createElement('label');
+                    powderLabel.textContent = 'Powder';
+                    powderLabel.htmlFor = `powder${i}`;
+                    productFieldGroup.appendChild(powderCheckbox);
+                    productFieldGroup.appendChild(powderLabel);
+
+                    productTypeContainer.appendChild(productFieldGroup);
+
+                    // Placeholder for product details fields
+                    const detailsContainer = document.createElement('div');
+                    detailsContainer.id = `details${i}`;
+                    detailsContainer.className = 'field-group';
+                    productTypeContainer.appendChild(detailsContainer);
+                }
+                document.getElementById('numberOfChemicals').setAttribute('disabled', true); // Disable the number input after generation
+                const generateProductFieldsButton = document.createElement('button');
+                generateProductFieldsButton.type = 'button';
+                generateProductFieldsButton.className = 'submit-button';
+                generateProductFieldsButton.textContent = 'Generate Product Fields';
+                generateProductFieldsButton.onclick = generateProductDetailsFields;
+                document.querySelector('form').appendChild(generateProductFieldsButton);
+            }
+        }
+
+        function generateProductDetailsFields() {
+            for (let i = 1; i <= parseInt(document.getElementById('numberOfChemicals').value); i++) {
+                const tabletsCheckbox = document.getElementById(`tablets${i}`);
+                const syrupCheckbox = document.getElementById(`syrup${i}`);
+                const powderCheckbox = document.getElementById(`powder${i}`);
+
+                const detailsContainer = document.getElementById(`details${i}`);
+                detailsContainer.innerHTML = ''; // Clear existing fields
+
+                if (tabletsCheckbox.checked) {
+                    detailsContainer.appendChild(createFieldGroup('Number of Tablet Boxes:', `tabletBoxes${i}`));
+                    detailsContainer.appendChild(createFieldGroup('Number of Straps in a Single Box:', `strapsInBox${i}`));
+                    detailsContainer.appendChild(createFieldGroup('Number of Tablets in Each Strap:', `tabletsInStrap${i}`));
+                }
+
+                if (syrupCheckbox.checked) {
+                    detailsContainer.appendChild(createFieldGroup('Number of Syrup Boxes:', `syrupBoxes${i}`));
+                    detailsContainer.appendChild(createFieldGroup('Number of Bottles in Each Box:', `syrupBottlesInBox${i}`));
+                    detailsContainer.appendChild(createFieldGroup('Quantity in Each Bottle (L):', `syrupQuantity${i}`));
+                }
+
+                if (powderCheckbox.checked) {
+                    detailsContainer.appendChild(createFieldGroup('Number of Powder Boxes:', `powderBoxes${i}`));
+                    detailsContainer.appendChild(createFieldGroup('Number of Bottles in Each Box:', `powderBottlesInBox${i}`));
+                    detailsContainer.appendChild(createFieldGroup('Quantity in Each Bottle (kg):', `powderQuantity${i}`));
+                }
+            }
+        }
+
+        function createFieldGroup(labelText, id) {
+            const fieldGroup = document.createElement('div');
+            fieldGroup.className = 'field-group';
+
+            const label = document.createElement('label');
+            label.textContent = labelText;
+            fieldGroup.appendChild(label);
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.id = id;
+            input.name = id;
+            input.placeholder = `Enter ${labelText.toLowerCase()}`;
+            input.required = true;
+            fieldGroup.appendChild(input);
+
+            return fieldGroup;
+        }
+
+        function resetForm() {
+            document.getElementById('productForm').reset();
+            document.getElementById('chemicalFields').innerHTML = '';
+            document.getElementById('productTypeContainer').innerHTML = '';
+            document.getElementById('numberOfChemicals').removeAttribute('disabled');
+            document.querySelector('.submit-button').remove();
+        }
+    </script>
+</body>
+</html>
