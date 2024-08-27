@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chemicals Tracking Form</title>
     <style>
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+    }
+    .checkbox-group input[type="checkbox"] {
+        margin-right: 5px;
+    }
+
         .container {
             width: 70%;
             margin: auto;
@@ -21,12 +29,21 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
-        .field-group input[type="text"] {
-            width: 100%;
+        .field-group input[type="text"], .field-group input[type="number"] {
+            width: calc(100% - 22px);
             padding: 8px;
             box-sizing: border-box;
             border: 1px solid #ccc;
             border-radius: 4px;
+        }
+        .horizontal-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .horizontal-group input[type="text"] {
+            flex: 1;
+            margin-right: 10px;
         }
         .chemical-block {
             margin: 20px 0;
@@ -38,12 +55,31 @@
             margin: 0 0 10px 0;
             font-weight: bold;
         }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Chemicals Tracking Form</h1>
-        
+
         <!-- Step 1: Select number of chemicals -->
         <form id="chemicalForm">
             <label for="chemicalCount">Select how many chemicals you have purchased:</label>
@@ -61,11 +97,24 @@
             <!-- Chemical selectors will be dynamically added here -->
             <div id="chemicalSelectors"></div>
 
+            <!-- Button to generate textboxes -->
+            <button type="button" onclick="generateTextBoxes()">Submit</button>
+
             <!-- Chemical detail fields will be dynamically added here -->
             <div id="chemicalFields"></div>
 
-            <!-- Submit button -->
-            <button type="submit">Submit</button>
+            <!-- Buyer information -->
+            <div class="field-group">
+                <label for="buyerName">Buyer's Name:</label>
+                <input type="text" id="buyerName" placeholder="Enter buyer's name">
+            </div>
+            <div class="field-group">
+                <label for="buyerAddress">Buyer's Address:</label>
+                <input type="text" id="buyerAddress" placeholder="Enter buyer's address">
+            </div>
+
+            <!-- Button to store buyer details and proceed -->
+            <button type="button" onclick="submitForm()">Submit</button>
         </form>
     </div>
 
@@ -80,12 +129,13 @@
             "Red Phosphorus"
         ];
 
+        let chemicalDetails = [];
+        let buyerDetails = {};
+
         function generateChemicalSelectors() {
             const chemicalCount = parseInt(document.getElementById('chemicalCount').value);
             const chemicalSelectors = document.getElementById('chemicalSelectors');
-            const chemicalFields = document.getElementById('chemicalFields');
-            chemicalSelectors.innerHTML = '';  // Clear any existing selectors
-            chemicalFields.innerHTML = '';  // Clear any existing fields
+            chemicalSelectors.innerHTML = '';
 
             if (chemicalCount > 0) {
                 for (let i = 0; i < chemicalCount; i++) {
@@ -98,9 +148,7 @@
                     const select = document.createElement('select');
                     select.name = `chemical${i + 1}`;
                     select.id = `chemical${i + 1}`;
-                    select.onchange = updateFields;
 
-                    // Add options for each chemical
                     chemicals.forEach(chemical => {
                         const option = document.createElement('option');
                         option.value = chemical;
@@ -114,117 +162,136 @@
             }
         }
 
-        function updateFields() {
-            const chemicalFields = document.getElementById('chemicalFields');
-            chemicalFields.innerHTML = '';  // Clear any existing fields
-
+        function generateTextBoxes() {
             const chemicalCount = parseInt(document.getElementById('chemicalCount').value);
+            const chemicalFields = document.getElementById('chemicalFields');
+            chemicalFields.innerHTML = '';
+
+            if (chemicalCount > 0) {
+                for (let i = 0; i < chemicalCount; i++) {
+                    const selectedChemical = document.getElementById(`chemical${i + 1}`).value;
+
+                    const chemicalBlock = document.createElement('div');
+                    chemicalBlock.className = 'chemical-block';
+
+                    const label = document.createElement('h3');
+                    label.innerHTML = `Chemical ${i + 1}: ${selectedChemical}`;
+                    chemicalBlock.appendChild(label);
+
+                    const sellerNameLabel = document.createElement('label');
+                    sellerNameLabel.innerHTML = "Seller's Name:";
+                    chemicalBlock.appendChild(sellerNameLabel);
+
+                    const sellerNameInput = document.createElement('input');
+                    sellerNameInput.type = 'text';
+                    sellerNameInput.id = `sellerName${i + 1}`;
+                    sellerNameInput.placeholder = "Enter seller's name";
+                    chemicalBlock.appendChild(sellerNameInput);
+
+                    const sellerAddressLabel = document.createElement('label');
+                    sellerAddressLabel.innerHTML = "Seller's Address:";
+                    chemicalBlock.appendChild(sellerAddressLabel);
+
+                    const sellerAddressInput = document.createElement('input');
+                    sellerAddressInput.type = 'text';
+                    sellerAddressInput.id = `sellerAddress${i + 1}`;
+                    sellerAddressInput.placeholder = "Enter seller's address";
+                    chemicalBlock.appendChild(sellerAddressInput);
+
+                    const amountLabel = document.createElement('label');
+                    amountLabel.innerHTML = 'Amount Purchased:';
+                    chemicalBlock.appendChild(amountLabel);
+
+                    const amountInput = document.createElement('input');
+                    amountInput.type = 'number';
+                    amountInput.id = `amount${i + 1}`;
+                    amountInput.placeholder = "Enter amount purchased";
+                    chemicalBlock.appendChild(amountInput);
+
+                    const unitCheckboxGroup = document.createElement('div');
+                    unitCheckboxGroup.className = 'checkbox-group';
+
+                    const kgCheckbox = document.createElement('input');
+                    kgCheckbox.type = 'checkbox';
+                    kgCheckbox.id = `kg${i + 1}`;
+                    kgCheckbox.value = 'kg';
+                    unitCheckboxGroup.appendChild(kgCheckbox);
+
+                    const kgLabel = document.createElement('label');
+                    kgLabel.htmlFor = `kg${i + 1}`;
+                    kgLabel.innerText = 'kg';
+                    unitCheckboxGroup.appendChild(kgLabel);
+
+                    const gmsCheckbox = document.createElement('input');
+                    gmsCheckbox.type = 'checkbox';
+                    gmsCheckbox.id = `gms${i + 1}`;
+                    gmsCheckbox.value = 'gms';
+                    unitCheckboxGroup.appendChild(gmsCheckbox);
+
+                    const gmsLabel = document.createElement('label');
+                    gmsLabel.htmlFor = `gms${i + 1}`;
+                    gmsLabel.innerText = 'gms';
+                    unitCheckboxGroup.appendChild(gmsLabel);
+
+                    chemicalBlock.appendChild(unitCheckboxGroup);
+
+                    const dateLabel = document.createElement('label');
+                    dateLabel.innerHTML = 'Buying Date:';
+                    chemicalBlock.appendChild(dateLabel);
+
+                    const dateInput = document.createElement('input');
+                    dateInput.type = 'date';
+                    dateInput.id = `buyingDate${i + 1}`;
+                    dateInput.style.marginRight = '10px';
+                    chemicalBlock.appendChild(dateInput);
+
+                    chemicalFields.appendChild(chemicalBlock);
+                }
+            }
+        }
+
+        function storeChemicalDetails() {
+            const chemicalCount = parseInt(document.getElementById('chemicalCount').value);
+            chemicalDetails = [];
 
             for (let i = 0; i < chemicalCount; i++) {
                 const selectedChemical = document.getElementById(`chemical${i + 1}`).value;
+                const sellerName = document.getElementById(`sellerName${i + 1}`).value;
+                const sellerAddress = document.getElementById(`sellerAddress${i + 1}`).value;
+                const amount = document.getElementById(`amount${i + 1}`).value;
+                const kgChecked = document.getElementById(`kg${i + 1}`).checked;
+                const gmsChecked = document.getElementById(`gms${i + 1}`).checked;
+                const buyingDate = document.getElementById(`buyingDate${i + 1}`).value;
 
-                const chemicalBlock = document.createElement('div');
-                chemicalBlock.className = 'chemical-block';
-
-                const chemicalLabel = document.createElement('h3');
-                chemicalLabel.innerHTML = `Chemical ${i + 1}: ${selectedChemical}`;
-                chemicalBlock.appendChild(chemicalLabel);
-
-                // Seller's Name
-                const sellerNameLabel = document.createElement('label');
-                sellerNameLabel.innerHTML = "Seller's Name:";
-                chemicalBlock.appendChild(sellerNameLabel);
-
-                const sellerNameInput = document.createElement('input');
-                sellerNameInput.type = 'text';
-                sellerNameInput.name = `sellerName${i + 1}`;
-                sellerNameInput.placeholder = "Enter seller's name";
-                chemicalBlock.appendChild(sellerNameInput);
-
-                // Seller's Address
-                const sellerAddressLabel = document.createElement('label');
-                sellerAddressLabel.innerHTML = "Seller's Address:";
-                chemicalBlock.appendChild(sellerAddressLabel);
-
-                const sellerAddressInput = document.createElement('input');
-                sellerAddressInput.type = 'text';
-                sellerAddressInput.name = `sellerAddress${i + 1}`;
-                sellerAddressInput.placeholder = "Enter seller's address";
-                chemicalBlock.appendChild(sellerAddressInput);
-
-                // Amount Purchased (in grams)
-                const amountLabel = document.createElement('label');
-                amountLabel.innerHTML = 'Amount Purchased in quantity :';
-                chemicalBlock.appendChild(amountLabel);
-
-                const amountInput = document.createElement('input');
-                amountInput.type = 'text';
-                amountInput.name = `amount${i + 1}`;
-                amountInput.placeholder = "Enter amount purchased in quantity";
-                chemicalBlock.appendChild(amountInput);
-
-                chemicalFields.appendChild(chemicalBlock);
+                chemicalDetails.push({
+                    chemical: selectedChemical,
+                    sellerName: sellerName,
+                    sellerAddress: sellerAddress,
+                    amount: amount,
+                    unit: kgChecked ? 'kg' : gmsChecked ? 'gms' : 'unknown',
+                    buyingDate: buyingDate
+                });
             }
+
+            console.log("Chemical Details:", chemicalDetails);
+        }
+
+        function submitForm() {
+            storeChemicalDetails(); // Ensure chemical details are stored
+            const buyerName = document.getElementById('buyerName').value;
+            const buyerAddress = document.getElementById('buyerAddress').value;
+
+            buyerDetails = {
+                name: buyerName,
+                address: buyerAddress
+            };
+
+            console.log("Buyer Details:", buyerDetails);
+
+            sessionStorage.setItem('chemicalDetails', JSON.stringify(chemicalDetails));
+            sessionStorage.setItem('buyerDetails', JSON.stringify(buyerDetails));
+            window.location.href = 'page3.html'; // Replace with the actual URL of your next page
         }
     </script>
-</body>
-</html>
-
-
-
-
-<hr>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buyers Information</title>
-    <style>
-        .container {
-            width: 50%;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        .field-group {
-            margin-bottom: 15px;
-        }
-        .field-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .field-group input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Buyers Information</h2>
-        <form id="manufacturerForm">
-            <!-- Manufacturer's Name -->
-            <div class="field-group">
-                <label for="manufacturerName">Buyer's Name:</label>
-                <input type="text" id="manufacturerName" name="manufacturerName" placeholder="Enter manufacturer's name">
-            </div>
-            
-            <!-- Manufacturer's Address -->
-            <div class="field-group">
-                <label for="manufacturerAddress">Buyer's Address:</label>
-                <input type="text" id="manufacturerAddress" name="manufacturerAddress" placeholder="Enter manufacturer's address">
-            </div>
-            
-            <!-- Submit button -->
-            <button type="submit">Submit</button>
-        </form>
-    </div>
 </body>
 </html>
